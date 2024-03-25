@@ -1,25 +1,77 @@
-// 声明文件
+// Mixins
 
-// 一些早期的库可能本身没有声明文件,如express 
-// 1. 可尝试使用npm i --save-dev @type/express 安装社区完成的声明文件
-// 2. 手写声明文件
-import axios from 'axios';
-import express from 'express';
+interface A {
+    num: number;
+}
+
+interface B {
+    str: string;
+}
+
+let a: A = {
+    num: 1
+}  
+
+let b: B = {
+    str: "hello"
+}
+
+// 对象混入
+//  1. 扩展运算符 浅拷贝 返回新的类型
+let c = {...a, ...b} 
+console.log(c)
+
+// 2. Object.assign 也是浅拷贝， 返回交叉类型
+let c2 = Object.assign({}, a, b) 
+console.log(c2)
 
 
-const app = express();
-const router = express.Router();
+// 类的混入
+class Logger {
+    log(msg: string) {
+        console.log(msg)
+    }
+}
 
-app.use('/api', router)
-router.get('/api', (req: any, res: any) => {
-    res.json({
-        code: 200
-    })
-})
+class Html {
+    render() {
+        return `<h1>Hello World</h1>`
+    }
+}
 
-app.listen(9001, () => {
-    console.log('http://localhost:9001/api')
-})
+class App {
+    run() {
+        console.log('run')
+    }
+}
+
+type Constructor<T> = new (...args: any[]) => T  // 类类型
+function pluginMixins<T extends Constructor<App>>(Base: T) {
+    return class extends Base {
+        Logger: Logger
+        Html: Html
+        constructor(...args: any[]) {
+            super(...args)
+            this.Logger = new Logger()
+            this.Html = new Html()
+        }
+
+        run() {
+            this.Logger.log('run')
+        }
+
+        render() {
+            return this.Html.render()
+        }
+    }
+}
+
+const mixins = pluginMixins(App)
+
+const app = new mixins()
+console.log(app.render())
+
+
 
 
 
