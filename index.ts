@@ -1,61 +1,39 @@
-// 函数类型
+// 联合类型
 
+let phone: number | string = '010-8928898'
 
-// 普通函数
-function add(a: number = 0, b: number = 0): number {
-    return a + b;
-}
-console.log(add())
-console.log(add(456, 789));
-
-// 箭头函数
-const sub = (a: number, b: number): number => a - b;
-console.log(sub(456, 789));
-
-
-// 使用?实现可选参数，无法与默认值连用
-function mul(a: number, b?: number): number {
-    if(b === undefined) {
-        b = 1
-    }
-    return a * b;
+let fn = function(type: number | boolean): boolean {
+    return !!type
 }
 
-console.log(mul(456))
+console.log(fn(123))
 
-// this
-interface Student {
+// 交叉类型
+interface People {
     name: string
-    likes: string[],
-    tell: (this: Student, num: number) => void
+    age: number
 }
 
-let st: Student = {
-    name: '小明',
-    likes: ['吃饭', '玩游戏'],
-    tell(num: number) {
-        console.log(this.name +'说：' + num);
-    }
+interface Man {
+    sex: number
 }
 
-st.tell(123);
 
-// 函数重载
-let arr: number[] = [1, 2, 3, 4, 1, 6, 7, 8]
+const ikun = (man: People & Man): void => {
+    console.log(man)
+} 
 
-function findNum(id: number): number[];
-function findNum(): number[];
-function findNum(ids: number[]): number[];
+ikun({
+    name: 'ikun',
+    age: 18,
+    sex: 1
+})
 
-function findNum(ids?: number | number[]): number[] {
-    if(typeof ids == 'number') {
-        return arr.filter((item) => item == ids)
-    } else if(Array.isArray(ids)) {
-        arr.push(...ids)
-        return arr
-    } else {
-        return arr
-    }
+
+// 类型断言
+let log = function(num: number | string): void {
+    console.log((num as string).length) // 也可以使用(<string>num).length
 }
 
-console.log(findNum(1))
+log('123')
+////log(123) 输出为undefined, 类型断言只起到欺骗编译器的作用
