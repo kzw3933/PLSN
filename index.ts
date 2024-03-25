@@ -1,23 +1,19 @@
-// any类型和unknown类型
-// any类型可以赋值给其他类型但是unknown类型不行，只能赋值给自身或any类型
-// unknown如果被赋值一个对象，无法读取属性也不能调用方法
-// unknown比any更加安全
+// Object, object与 {}
+// Object包含所有类型, 而object不包含原始类型，包含引用类型
+// {} 字面量类型可以理解为new Object, 可以使用任意类型, 但是被赋值对象后无法读取属性，也就无法对其更改
 
-let a: any = []
+
+let a: Object = 123
+a = []
 a = {test: "测试"}
-a = Symbol(1)
-
 console.log(a)
 
-let b: unknown = []
-b = {test: "测试"}
-b = Symbol(1)
+let b: object = []
 console.log(b)
 
-// 类型顺序
-// 1. top type: any和unknown
-// 2. Object
-// 3. Number String Boolean
-// 4. number string boolean
-// 5. 1 '测试' false
-// 6. never
+let c: {} = {test: "测试"}
+console.log(c)
+
+let d: {} = a
+console.log(d)
+//// d.age = 34
