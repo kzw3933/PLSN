@@ -1,9 +1,7 @@
-export var a = 1;
-export var b = 'ikun'
+import {NS} from './lib'
 
-var x = 1
-var fn = function() {
-    return 123
-}
+import a = NS.a;
 
-console.log(x, fn)
+console.log(NS.add(1,2))
+
+console.log(a)
