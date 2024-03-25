@@ -1,15 +1,36 @@
-// 类型推论
-let arr = [1,2,3] // number[]
+// never类型
 
-let str   // any
-str = 456
+type A = number & string // never类型
+
+function error(): never {
+    throw new Error('error')
+}
+
+function loop(): never {
+    while (true) {
+        
+    }
+}
+
+type B = void | number | never // void | number类型
 
 
-// 类型别名
-type str = string
+type C = 'sing' | 'dance' | 'rap'
 
-let str1: str = 'usdiod'
+function kun(value: C) {
+    switch(value) {
+        case 'sing':
+            break
+        case 'dance':
+            break
+        case 'rap':
+            break
+        default:
+            // 兜底逻辑
+            const error: never = value
+            break
+    }
+}
 
-type num = 1 extends number ? 1 : 0   // 和类别的层级关系有关
+console.log(kun('sing'))
 
-let num1: num = 1
