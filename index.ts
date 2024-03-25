@@ -1,77 +1,102 @@
-// Mixins
+// 装饰器
+import axios from 'axios'
+import 'reflect-metadata'
 
-interface A {
-    num: number;
+// 类装饰器 target参数是构造函数, 再不破坏的类的结构的基础上为类增加功能或属性
+
+const Base1: ClassDecorator = (target) => {
+    target.prototype.fn = () => {
+        console.log('fn')
+    } 
 }
 
-interface B {
-    str: string;
+@Base1
+class Http1 {
+
 }
 
-let a: A = {
-    num: 1
-}  
+const http1 = new Http1() as any
+http1.fn()
 
-let b: B = {
-    str: "hello"
+// 装饰器工厂 curry化
+const Base2 = (name: string) => {
+    const fn: ClassDecorator = (target) => {
+        target.prototype.fn = () => {
+            console.log(name)
+        } 
+    }
+    return fn
 }
 
-// 对象混入
-//  1. 扩展运算符 浅拷贝 返回新的类型
-let c = {...a, ...b} 
-console.log(c)
+@Base2("function")
+class Http2 {
 
-// 2. Object.assign 也是浅拷贝， 返回交叉类型
-let c2 = Object.assign({}, a, b) 
-console.log(c2)
+}
+
+const http2 = new Http2() as any
+http2.fn()
+
+// 方法装饰器
+
+const Get = (url: string) => {
+    const fn: MethodDecorator = (target, key, descriptor: PropertyDescriptor) => {
+        console.log(key, descriptor, descriptor)
+        axios.get(url).then(res => {
+            descriptor.value(res.data)
+        })
+    }
+
+    return fn
+}
 
 
-// 类的混入
-class Logger {
-    log(msg: string) {
-        console.log(msg)
+
+class Http3 {
+    @Get('https://api.apiopen.top/api/getHaoKanVideo?page=0&size=10')
+    getList(data: any) {
+        console.log(data.result.list)
     }
 }
 
-class Html {
-    render() {
-        return `<h1>Hello World</h1>`
+// 参数装饰器
+
+const GetResult = (url: string) => {
+    const fn: MethodDecorator = (target, _, descriptor: PropertyDescriptor) => {
+        const key = Reflect.getMetadata('key', target)
+        axios.get(url).then(res => {
+            descriptor.value(key ? res.data[key] : res.data)
+        })
+    }
+
+    return fn
+}
+
+const Result = () => {
+    const fn: ParameterDecorator = (target, key, index) => {
+        Reflect.defineMetadata('key', 'result', target)
+        console.log(target, key, index)
+    }
+    return fn;
+}
+
+
+class Http4 {
+    @GetResult('https://api.apiopen.top/api/getHaoKanVideo?page=0&size=10')
+    getList(@Result() data: any) {
+        console.log(data.list)
     }
 }
 
-class App {
-    run() {
-        console.log('run')
-    }
+// 属性装饰器
+
+const Name: PropertyDecorator = (target, key) => {
+    console.log(target, key)
 }
 
-type Constructor<T> = new (...args: any[]) => T  // 类类型
-function pluginMixins<T extends Constructor<App>>(Base: T) {
-    return class extends Base {
-        Logger: Logger
-        Html: Html
-        constructor(...args: any[]) {
-            super(...args)
-            this.Logger = new Logger()
-            this.Html = new Html()
-        }
-
-        run() {
-            this.Logger.log('run')
-        }
-
-        render() {
-            return this.Html.render()
-        }
+class Http5 {
+    @Name
+    name: string
+    constructor() {
+        this.name = 'name'
     }
 }
-
-const mixins = pluginMixins(App)
-
-const app = new mixins()
-console.log(app.render())
-
-
-
-
-
