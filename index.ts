@@ -1,39 +1,23 @@
-// 字符串类型
-let str1: string = "学习ts"
-let str2: string = `${str1}`
-console.log(str1)
-console.log(str2)
+// any类型和unknown类型
+// any类型可以赋值给其他类型但是unknown类型不行，只能赋值给自身或any类型
+// unknown如果被赋值一个对象，无法读取属性也不能调用方法
+// unknown比any更加安全
 
-// 数字类型
-let num: number = 123.123
-let nan: number = NaN
-let inf: number = Infinity
-let dec: number = 6
-let bin: number = 0b1010
-let hex: number = 0xf00d
-let oct: number = 0o744
-console.log(num)
-console.log(nan)
-console.log(inf)
-console.log(dec)
-console.log(bin)
-console.log(hex)
-console.log(oct)
+let a: any = []
+a = {test: "测试"}
+a = Symbol(1)
 
-// 布尔类型
-let bt: boolean = true
-let bf: boolean = false
-console.log(bt)
-console.log(bf)
+console.log(a)
 
-// null和undefined类型, 严格模式下两者无法穿插赋值
-let n: null = null
-let u: undefined = undefined
-console.log(n)
-console.log(u)
+let b: unknown = []
+b = {test: "测试"}
+b = Symbol(1)
+console.log(b)
 
-// void类型, 严格模式下无法将null赋值给void类型, void一般用于函数上
-////let v1: void = null 
-let v2: void = undefined
-////console.log(v1)
-console.log(v2)
+// 类型顺序
+// 1. top type: any和unknown
+// 2. Object
+// 3. Number String Boolean
+// 4. number string boolean
+// 5. 1 '测试' false
+// 6. never
