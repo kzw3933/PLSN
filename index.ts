@@ -1,49 +1,45 @@
-// 泛型
+// 泛型约束
 
-// 泛型函数
-function toArray<T>(...args: T[]): Array<T> {
-    return [...args]
+function add<T extends number>(a: T, b: T) {
+    return a + b;
 }
 
-console.log(toArray(1,2,3))
+console.log(add(1,2))
 
-// 泛型type
-type A<T> = string | number | T
-let a: A<boolean> = true
 
-// 泛型interface
 
-interface Data<T> {
-    msg: T
+interface Len {
+    length: number
+}
+
+function fn<T extends Len>(a: T) {
+    return a.length;
+}
+
+console.log(fn('12333'))
+
+
+let obj = {
+    name: 'foo',
+    sex: 'female'
+}
+
+// keyof约束
+type Key = keyof typeof obj
+
+function fn2<T extends object, K extends keyof T>(obj: T, key: K) {
+    return obj[key];
 }
 
 
-function concat<T=number, K=string>(a: T, b: K): [T, K] {
-    return [a, b]
+interface Data {
+    name: string
+    age: number
+    sex: string
 }
 
-const axios = {
-    get<T>(url: string): Promise<T> {
-        return new Promise((resolve, reject) => {
-            let xhr: XMLHttpRequest = new XMLHttpRequest();
-            xhr.open('GET', url)
-            xhr.onreadystatechange = () => {
-                if(xhr.readyState == 4 && xhr.status == 200) {
-                    resolve(JSON.parse(xhr.responseText))
-                }
-            }
-            xhr.send(null);
-        })
-    }
+type Options<T extends object> = {
+    [key in keyof T]?: T[key]    // 映射类型的语法 { [k in keys]: Type }
 }
 
-interface Response {
-    message: string,
-    code: number
-}
-
-axios.get<Response>('./data.json').then(
-    res => {
-        console.log(res.message)
-    }
-)
+type B = Options<Data>
