@@ -1,16 +1,27 @@
-// 命名空间
+// 模块解析
 
-// 支持嵌套
-// 同名的namespace会合并
-// 最外部的namespace支持导出供其他模块使用, 所有变量和方法必须export才能被外部使用
-// 常用场景: 跨端的项目 h5 Android ios 小程序 做场景的拆分
+// 默认导出 导出的内容可以是任意类型, 一个模块只能出现一个
+export default 1
 
-export namespace NS {
-    export let a = 1;  
-    export const add = (a: number, b: number) => a + b;
+// 分别导出
+export let a = 2
+export const add = (x: number, y: number) => x + y
 
-    export namespace Inner {
-        export let a = 'kzw';
-        export const sub = (a: number, b: number) => a - b;
-    }
+// 解构导出
+let sum = (...args: number[]) => {
+    return args.reduce((a, b) => a + b)
+}
+
+let mul = (...args: number[]) => {
+    return args.reduce((a, b) => a * b)
+}
+
+let max = (...args: number[]) => {
+    return Math.max(...args)
+}
+
+export {
+    sum,
+    mul,
+    max,
 }
