@@ -1,39 +1,32 @@
-// 联合类型
+// 内置对象
+// js是由三个部分组成的 ECMAScript、DOM、BOM
+// ECMA: Number Date RegExp Error XMLHttprequest
+// DOM: querySelect MouseEvent
+// BOM: promise localstorage location cookie
 
-let phone: number | string = '010-8928898'
-
-let fn = function(type: number | boolean): boolean {
-    return !!type
-}
-
-console.log(fn(123))
-
-// 交叉类型
-interface People {
-    name: string
-    age: number
-}
-
-interface Man {
-    sex: number
-}
+let num: Number = new Number(0);
+let date: Date = new Date()
+let reg: RegExp = new RegExp(/\w/)
+let err: Error = new Error('Invalid Data')
+// let xhr: XMLHttpRequest = new XMLHttpRequest() 只能在网页端执行
 
 
-const ikun = (man: People & Man): void => {
-    console.log(man)
-} 
+// HTML(元素名称)Element HTMLElement Element
+// let div = document.querySelector('div') 只能在网页端执行
 
-ikun({
-    name: 'ikun',
-    age: 18,
-    sex: 1
+// let divs: NodeList = document.querySelectorAll('div') 只能在网页端执行
+// let nodes: NodeListOf<HTMLDivElement | HTMLSpanElement> = document.querySelectorAll('div span') 只能在网页端执行
+
+
+// let local: Storage = localStorage 只能在网页端执行
+// let loc: Location = window.location 只能在网页端执行
+
+let promise: Promise<number> = new Promise((resolve) => resolve(1))
+// let cookie: string = document.cookie 只能在网页端执行
+
+promise.then(res => {
+    console.log(res)
 })
 
 
-// 类型断言
-let log = function(num: number | string): void {
-    console.log((num as string).length) // 也可以使用(<string>num).length
-}
 
-log('123')
-////log(123) 输出为undefined, 类型断言只起到欺骗编译器的作用
