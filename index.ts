@@ -1,78 +1,49 @@
-// 生成器
-function* gen() {
-    yield Promise.resolve('A')
-    yield 'B'
-    yield 'C'
-    yield 'D'
+// 泛型
+
+// 泛型函数
+function toArray<T>(...args: T[]): Array<T> {
+    return [...args]
 }
 
-const genr = gen()
-console.log(genr.next())
-console.log(genr.next())
-console.log(genr.next())
-console.log(genr.next())
-console.log(genr.next())
+console.log(toArray(1,2,3))
 
-// 迭代器
+// 泛型type
+type A<T> = string | number | T
+let a: A<boolean> = true
 
-let set: Set<number> = new Set([1,2,3,1,2,3]) // 去重后1,2,3
-let map: Map<any, any> = new Map<number, number>
+// 泛型interface
 
-let Arr = [1,2,3]
-map.set(Arr, '数组123')
-
-console.log(map.get(Arr))
-
-const each = (value: any) => {
-    let iter: any = value[Symbol.iterator]()
-    let next: any = {done: false}
-    while(!next.done) {
-        next = iter.next()
-        if(!next.done) {
-            console.log(next.value)
-        }
-    }
+interface Data<T> {
+    msg: T
 }
 
-each(map)
 
-
-// 迭代器的语法糖, for of不能用于对象，对象上没有iterator
-for(let val of set) {
-    console.log(val)
+function concat<T=number, K=string>(a: T, b: K): [T, K] {
+    return [a, b]
 }
 
-// 解构的底层原理也是调用iterator
-let [a, b, c] = [1,2,3]
-let copy = [...Arr]
-console.log(a, b, c)
-console.log(copy)
-
-// 对象支持for of
-let obj = {
-    max: 5,
-    current: 0,
-    [Symbol.iterator]() {
-        return {
-            max: this.max,
-            current: this.current,
-            next() {
-                if(this.current == this.max) {
-                    return {
-                        value: undefined,
-                        done: true
-                    }
-                } else {
-                    return {
-                        value: this.current++,
-                        done: false
-                    }
+const axios = {
+    get<T>(url: string): Promise<T> {
+        return new Promise((resolve, reject) => {
+            let xhr: XMLHttpRequest = new XMLHttpRequest();
+            xhr.open('GET', url)
+            xhr.onreadystatechange = () => {
+                if(xhr.readyState == 4 && xhr.status == 200) {
+                    resolve(JSON.parse(xhr.responseText))
                 }
             }
-        }
+            xhr.send(null);
+        })
     }
 }
 
-for(let val of obj) {
-    console.log(val)
+interface Response {
+    message: string,
+    code: number
 }
+
+axios.get<Response>('./data.json').then(
+    res => {
+        console.log(res.message)
+    }
+)
