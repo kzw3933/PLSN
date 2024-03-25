@@ -1,21 +1,25 @@
+// 声明文件
 
-// 使用方式import 如果是默认导出，名称可以随便取
-// 可以使用 import * as api from './lib' 查看暴露了哪些内容
-import xx, {a, add as addOfLib, sum, mul, max} from './lib'
+// 一些早期的库可能本身没有声明文件,如express 
+// 1. 可尝试使用npm i --save-dev @type/express 安装社区完成的声明文件
+// 2. 手写声明文件
+import axios from 'axios';
+import express from 'express';
 
-console.log(xx)
-console.log(a)
-console.log(addOfLib(3,4))
 
-console.log(sum(1,2,3))
-console.log(mul(1,2,3))
-console.log(max(1,2,3))
+const app = express();
+const router = express.Router();
 
-// 动态引入
-// import 只能在最上层使用
-if(true) {
-    import('./lib').then(res => {
-        console.log(res)
+app.use('/api', router)
+router.get('/api', (req: any, res: any) => {
+    res.json({
+        code: 200
     })
-}
+})
+
+app.listen(9001, () => {
+    console.log('http://localhost:9001/api')
+})
+
+
 
