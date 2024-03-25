@@ -1,23 +1,58 @@
-// 元组类型
-// 一种特殊的数组，继承了数组的方法，因此仍然可以使用push方法，编译本身不会阻止这样做
+// 枚举
 
-let arr1 = [1, false]
-let arr2: [number, boolean] = [1, false]
+// 数字枚举
+enum Color {
+    red = 1, // 默认从0开始
+    green,
+    blue
+}
 
-arr1.push(34)
-arr2.push(45)
+console.log(Color.red)  
 
-console.log(arr1)
-console.log(arr2)
+// 字符串枚举
+enum ColorStr {
+    red = '红色',
+    green = '绿色',
+    blue = '蓝色'
+}
 
-let arr3: readonly [x: number, y?:boolean] = [1]
+console.log(ColorStr.red)
 
-type first = typeof arr3[0]
+// 异构枚举
+enum Check {
+    yes = 1,
+    no = 'no'
+}
 
-console.log(arr3['length'])
+console.log(Check.no)
 
-let excel: [string, string, number][] = [
-    ['str1', 'str2', 23],
-    ['str3', 'str4', 34],
-    ['str5', 'str6', 45]
-]
+// 接口枚举
+interface A {
+    red: Color.red
+}
+
+
+let obj: A = {
+    red: Color.red
+}
+
+// const枚举 被tsc编译后直接就是常量
+const enum Types {
+    success,
+    fail
+}
+
+let code: number = 0
+
+if (code === Types.success) {
+    console.log('success')
+}
+
+// 反向映射
+enum Sexs {
+    male,
+    female
+} 
+let man: number = Sexs.male
+let key = Sexs[man]
+console.log(`value---${man}`, `key---${key}`)
