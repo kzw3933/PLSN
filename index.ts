@@ -1,32 +1,121 @@
-// 内置对象
-// js是由三个部分组成的 ECMAScript、DOM、BOM
-// ECMA: Number Date RegExp Error XMLHttprequest
-// DOM: querySelect MouseEvent
-// BOM: promise localstorage location cookie
+// class
 
-let num: Number = new Number(0);
-let date: Date = new Date()
-let reg: RegExp = new RegExp(/\w/)
-let err: Error = new Error('Invalid Data')
-// let xhr: XMLHttpRequest = new XMLHttpRequest() 只能在网页端执行
+// class基本用法、继承、类型约束、implements、super
+
+interface Options {
+    el: string | HTMLElement
+}
+
+interface VueCls {
+    options: Options
+    init():void
+}
+
+interface Vnode {
+    tag: string,
+    text?: string
+    children?: Vnode[]
+}
 
 
-// HTML(元素名称)Element HTMLElement Element
-// let div = document.querySelector('div') 只能在网页端执行
+class Dom {
+    // 创建节点的方法
+    createElement(el: string) {
+        return document.createElement(el);
+    }
+    // 填充文本的方法
+    setText(el: HTMLElement, text: string | null) {
+        el.textContent = text;
+    }
+    // 渲染函数
+    render(data: Vnode) {
+        let root = this.createElement(data.tag)
+        if(data.children && Array.isArray(data.children)) {
+            data.children.forEach(item => {
+                let child = this.render(item);!
+                root.appendChild(child);
+            })
+        } else {
+            this.setText(root, data.text ?? null);
+        }
 
-// let divs: NodeList = document.querySelectorAll('div') 只能在网页端执行
-// let nodes: NodeListOf<HTMLDivElement | HTMLSpanElement> = document.querySelectorAll('div span') 只能在网页端执行
+        return root
+    } 
+}
 
+class Vue extends Dom implements VueCls {
+    options: Options;
+    constructor(options: Options) {
+        super(); // 父类的prototype.constructor.call
+        this.options = options
+        this.init()
+    }
+    init(): void {
+        // 虚拟dom 就是通过js去渲染真实的dom
+        let data: Vnode = {
+            tag: 'div',
+            children: [
+                {
+                    tag: 'h1',
+                    text: 'Hello Vue!'
+                },
+                {
+                    tag: 'p',
+                    text: 'Welcome to Vue!'
+                }
+            ]
+        }
+        let app = typeof this.options.el == 'string'? document.querySelector(this.options.el) : this.options.el;
+        app?.appendChild(this.render(data))
+    }
+}
 
-// let local: Storage = localStorage 只能在网页端执行
-// let loc: Location = window.location 只能在网页端执行
-
-let promise: Promise<number> = new Promise((resolve) => resolve(1))
-// let cookie: string = document.cookie 只能在网页端执行
-
-promise.then(res => {
-    console.log(res)
+let app = new Vue({
+    el: '#app'
 })
 
+// class的修饰符 readonly private protected public
+// readonly用于属性前，代表只读
+// private 用于属性或方法前, 只能在类内部使用(子类中也无法使用)
+// protected 可以给子类和内部使用
+// public 公开, 默认即为public
+
+class Student {
+    readonly age: number
+    constructor(age: number) {
+        this.age = age
+    }
+    private say() {
+        console.log(this.age)
+    }
+}
+
+// 静态方法
+class Teacher {
+    name: string
+    constructor(name: string) {
+        this.name = name
+    }
+    static job() {
+        console.log('Teacher')
+    }
+}
+
+// get和set
+class Ref {
+    _value: any
+    constructor(value: any) {
+        this._value = value
+    }
+
+    get value() {
+        return this._value
+    }
+
+    set value(value: any) {
+        this._value = value
+    }
+}
 
 
+const ref = new Ref('test')
