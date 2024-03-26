@@ -1,51 +1,50 @@
-// weakset weakmap Set Map
+// Proxy与Reflect
 
-// Set
-interface I {
-    name: string
-    id: number
+// Proxy支持对象、数组、函数、set、map
+// 支持拦截get-->取值, set-->赋值, apply-->函数调用, has-->in操作, ownKeys-->for in操作, 
+// construct-->new操作, deleteProperty-->delete操作
+let person = { name: "jack", age: 24 }
+let personProxy = new Proxy(person, {
+    get(target, key, receiver) {
+        console.log(target, key, receiver)
+        if(target.age <= 18) {
+            return Reflect.get(target, key, receiver)
+        } else {
+            return '成年'
+        }
+    }
+})
+
+
+console.log(personProxy.age)
+console.log(Reflect.get(person, 'age'))
+console.log(person.age) 
+
+
+// 观察者模式
+
+const list: Set<Function> = new Set()
+
+const autorun = (callback: Function) => {
+    if(!list.has(callback)) {
+        list.add(callback)
+    }
 }
 
-let i1: I = {
-    name: "John",
-    id: 1
+const observable = <T extends object>(params: T) => {
+    return new Proxy(params, {
+        set(target, key, value, receiver) {
+            const result = Reflect.set(target, key, value, receiver)
+            list.forEach(fn => fn())
+            return result
+        }
+    })
 }
 
-let i2: I = {
-    name: "John",
-    id: 1
-}
+const studentProxy = observable({name: 'turing', age: 89})
 
-let set1: Set<number> = new Set([1,2,3, 3, 3, 6, 7]) // 去重, 引用类型除外
-let set2: Set<string> = new Set(['456', '456'])
-let set3: Set<I> = new Set([i1, i2])
+autorun(() => {
+    console.log("student")
+})
 
-console.log(set1)
-console.log(set2)
-console.log(set3)
-
-console.log(set1.has(5))
-console.log(set1.delete(7))
-console.log(set1.add(8))
-set1.clear()
-
-// Map 
-// 和对象不同，map的key可以是应用类型
-let obj = {name: 'kzw'}
-let map: Map<object, any> = new Map()
-
-map.set(obj, 123)
-
-console.log(map)
-
-
-// weakmap weakmap 不会增加引用次数
-// weakmap的key只能是引用类型
-let obj1:any = {name: 'obj1'}
-let obj2:any = obj1
-
-let weakmap: WeakMap<object, any> = new WeakMap()
-weakmap.set(obj2, 'obj2')
-console.log(weakmap.get(obj1))
-obj1 = null
-obj2 = null
+studentProxy.age = 89
