@@ -6,6 +6,14 @@
     <title>Document</title>
 </head>
 <body>
-    <script src="./index.js"></script>
+    <script type="module">
+        import {Storage} from './dist/index.js'
+        const store = new Storage();
+        store.set('a', 123, new Date().getTime() + 5000)
+        setInterval(() => {
+            let a = store.get('a');
+            console.log(a);
+        }, 500)
+    </script>
 </body>
 </html>
