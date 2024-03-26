@@ -1,57 +1,36 @@
-// 泛型工具
+// infer 推导泛型参数
 
 interface User {
-    address: string, 
-    age: number, 
-    name?: string, 
-    sex: string
-} 
-
-// Partial 所有属性使其可选
-type PartialUser = Partial<User>
-type CustPartial<T> = {
-    [P in keyof T]?: T[P]
+    name: string
+    age: number
 }
 
-// Required 所有属性使其必选
-type RequiredUser = Required<User>
-type CustRequired<T> = {
-    [P in keyof T]-?:T[P]
+
+// 推导Promise参数
+type PPType = Promise<Promise<User>>
+
+type GetPromiseType<T> = T extends Promise<infer K> ? GetPromiseType<K> : T
+
+type T = GetPromiseType<PPType>
+
+
+// infer 协变
+// 产生协变会返回联合类型
+let obj = {
+    name: '123',
+    age: 12
 }
 
-// Pick 提取部分属性
-type PickUser = Pick<User, 'age' | 'name'>
-type CustPick<T, K extends keyof T> = {
-    [P in K]: T[P]
-}
+type Bar1<T> = T extends {name: infer N, age: infer A} ? [N, A] : T
+type Bar2<T> = T extends {name: infer N, age: infer N} ? N : T
+type U1 = Bar1<typeof obj>
+type U2 = Bar2<typeof obj>
 
-// Exclude 排除部分属性
-type ExcludeUser = Exclude<'a' | 'b' | 'c', 'b' | 'c'>
-type CustExclude<T, K> = T extends K ? never : T; // never在联合类型中会被排除掉
+// infer 逆变
+// 产生逆变会返回交叉类型
+type Tar<T> = T extends {
+    a: (x: infer U) => void,
+    b: (x: infer U) => void
+} ? U : T
 
-
-// Omit 排除部分属性后返回新的类型
-type OmitUser = Omit<User, 'name'>
-type CustOmit<T, K> = Pick<T, Exclude<keyof T, K>>
-
-
-// Record 约束对象的key和value, 支持嵌套
-type Key = 'c' | 'x' | 'k' // key不能少
-type Value = 'sing' | 'dance' | 'rap' // value随意
-
-let obj: Record<Key, Value> = {
-    c:'sing',
-    x: 'dance',
-    k: 'rap',
-}
-
-type ObjKey = keyof any // 对象的key只能是number, string, symbol
-type CustRecord<K extends ObjKey, T> = {
-    [P in K]: T
-}                    
-
-// ReturnType 获取函数类型的返回类型
-const fn = () => [1,2,3, "str"]
-
-type arrNumStr = ReturnType<typeof fn>
-type CustReturnType<F extends Function> = F extends (...args: any[]) => infer Res ? Res : never
+type V = Tar<{a: (x: number) => void, b: (x:string) => void }>
