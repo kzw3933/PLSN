@@ -1,98 +1,51 @@
-// 发布订阅模式
+// weakset weakmap Set Map
 
-// vue2: eventBus $on监听 $emit派发
-// electron: ipcRenderer ipcMain 通讯
-// DOM2: addEventListener removeEventListener
-
-
-// DOM2 发布订阅模式
-
-// 监听器
-const callback = () => {
-    console.log('kzw')
-}
-
-document.addEventListener('kzw', callback, {
-    once: true // 只触发一次
-})
-
-// 订阅中心
-const e = new Event('kzw')
-
-// 支持删除监听器函数
-document.removeEventListener('kzw', callback)
-
-// 派发
-document.dispatchEvent(e)
-document.dispatchEvent(e)
-document.dispatchEvent(e)
-
-// 手动实现发布订阅模式
-// 实现 once on emit off 订阅中心
+// Set
 interface I {
-    events: Map<string, Function[]>
-    once: (event: string, callback: Function) => void
-    on: (event: string, callback: Function) => void
-    emit: (event: string, ...args: any[]) => void
-    off: (event: string, callback: Function) => void
+    name: string
+    id: number
 }
 
-class Emitter implements I {
-    events: Map<string, Function[]>;
-    constructor() {
-        this.events = new Map();
-    }
-    once(event: string, callback: Function) {
-        const inner = (...args: any[]) => {
-            callback(...args)
-            this.off(event, inner)
-        }
-        this.on(event, inner)
-    }
-    on(event: string, callback: Function) {
-        if(this.events.has(event)) {
-            const callbackList = this.events.get(event)
-            callbackList && callbackList.push(callback)
-        } else {
-            this.events.set(event, [callback])
-        }
-    }
-    emit(event: string, ...args: any[]) {
-        const callbackList = this.events.get(event)
-        if(callbackList) {
-            callbackList.forEach(fn => {
-                fn(...args)
-            })
-        }
-    }
-    off(event: string, callback: Function) {
-        const callbackList = this.events.get(event)
-        if(callbackList) {
-            callbackList.splice(callbackList.indexOf(callback), 1)
-        }
-    }
+let i1: I = {
+    name: "John",
+    id: 1
 }
 
-
-const bus = new Emitter()
-
-const fn = (b: boolean, n: number) => {
-    console.log(b, n)
+let i2: I = {
+    name: "John",
+    id: 1
 }
 
-bus.on('kzw', fn)
+let set1: Set<number> = new Set([1,2,3, 3, 3, 6, 7]) // 去重, 引用类型除外
+let set2: Set<string> = new Set(['456', '456'])
+let set3: Set<I> = new Set([i1, i2])
+
+console.log(set1)
+console.log(set2)
+console.log(set3)
+
+console.log(set1.has(5))
+console.log(set1.delete(7))
+console.log(set1.add(8))
+set1.clear()
+
+// Map 
+// 和对象不同，map的key可以是应用类型
+let obj = {name: 'kzw'}
+let map: Map<object, any> = new Map()
+
+map.set(obj, 123)
+
+console.log(map)
 
 
+// weakmap weakmap 不会增加引用次数
+// weakmap的key只能是引用类型
+let obj1:any = {name: 'obj1'}
+let obj2:any = obj1
 
-bus.once('message', fn)
-
-bus.emit('kzw', false, 1)
-bus.emit('kzw', false, 1)
-bus.emit('kzw', false, 1)
-bus.off('kzw', fn)
-bus.emit('kzw', false, 1)
-
-bus.emit('message', true, 1)
-bus.emit('message', true, 1)
-bus.emit('message', true, 1)
-bus.emit('message', true, 1)
+let weakmap: WeakMap<object, any> = new WeakMap()
+weakmap.set(obj2, 'obj2')
+console.log(weakmap.get(obj1))
+obj1 = null
+obj2 = null
