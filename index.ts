@@ -1,36 +1,20 @@
-// infer 推导泛型参数
+// infer 使用实例
 
-interface User {
-    name: string
-    age: number
-}
+type Arr = ['a', 'b', 'c']
 
-
-// 推导Promise参数
-type PPType = Promise<Promise<User>>
-
-type GetPromiseType<T> = T extends Promise<infer K> ? GetPromiseType<K> : T
-
-type T = GetPromiseType<PPType>
+// 提取头部元素
+type First<T extends any[]> = T extends [infer F, ...any[]] ? F : []
+type a = First<Arr>
 
 
-// infer 协变
-// 产生协变会返回联合类型
-let obj = {
-    name: '123',
-    age: 12
-}
+// 剔除尾部元素
+type Pop<T extends any[]> = T extends [...infer Rest, unknown] ? Rest : []
+type rest = Pop<Arr>
 
-type Bar1<T> = T extends {name: infer N, age: infer A} ? [N, A] : T
-type Bar2<T> = T extends {name: infer N, age: infer N} ? N : T
-type U1 = Bar1<typeof obj>
-type U2 = Bar2<typeof obj>
+// shift
+type Shift<T extends any[]> = T extends [unknown, ...infer Rest] ? Rest : []
+type s = Shift<Arr>
 
-// infer 逆变
-// 产生逆变会返回交叉类型
-type Tar<T> = T extends {
-    a: (x: infer U) => void,
-    b: (x: infer U) => void
-} ? U : T
-
-type V = Tar<{a: (x: number) => void, b: (x:string) => void }>
+// 反转 递归
+type Reverse<T extends any[]> = T extends [infer First, ...infer Rest] ? [...Reverse<Rest>, First]: T;
+type r = Reverse<Arr>
