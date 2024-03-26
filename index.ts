@@ -1,50 +1,42 @@
-// Proxy与Reflect
+// 类型守卫
 
-// Proxy支持对象、数组、函数、set、map
-// 支持拦截get-->取值, set-->赋值, apply-->函数调用, has-->in操作, ownKeys-->for in操作, 
-// construct-->new操作, deleteProperty-->delete操作
-let person = { name: "jack", age: 24 }
-let personProxy = new Proxy(person, {
-    get(target, key, receiver) {
-        console.log(target, key, receiver)
-        if(target.age <= 18) {
-            return Reflect.get(target, key, receiver)
-        } else {
-            return '成年'
-        }
-    }
-})
+// 1. 类型收缩
+// typeof是有缺陷的， 对于 数组、对象返回object
+const isStr = (str: any) => typeof str === 'string'
+const isArray = (arr: any) => arr instanceof Array
+
+// 2. 类型谓词
+const isObj = (arg: any) => ({}).toString.call(arg) === '[object Object]'
+const isNum = (num: any): num is number => typeof num === 'number' // 类型谓词
+const isString = (str: any): str is string => typeof str === 'string' // 类型谓词
+const isFun = (fun: any): fun is Function => typeof fun === 'function' // 类型谓词
 
 
-console.log(personProxy.age)
-console.log(Reflect.get(person, 'age'))
-console.log(person.age) 
-
-
-// 观察者模式
-
-const list: Set<Function> = new Set()
-
-const autorun = (callback: Function) => {
-    if(!list.has(callback)) {
-        list.add(callback)
+const fn = (data: any) => {
+    if(isObj(data)) {
+        // 遍历属性不能用for in, 会遍历原型上的属性
+        Object.keys(data).forEach(key => {
+            let val = data[key]
+            if(isNum(val)) {
+                data[key] = val.toFixed(2)
+            } 
+            if(isString(val)) {
+                data[key] = val.trim()
+            }
+            if(isFun(val)) {
+                data[key]() // 如果直接使用val(), 会出现undefined, js中函数独立调用如果在浏览器中this指向window, nodejs中为undefined
+            }
+        })
     }
 }
 
-const observable = <T extends object>(params: T) => {
-    return new Proxy(params, {
-        set(target, key, value, receiver) {
-            const result = Reflect.set(target, key, value, receiver)
-            list.forEach(fn => fn())
-            return result
-        }
-    })
+
+let obj = {
+    a: 100.222,
+    b: "  jsjks ",
+    c: function() {
+        console.log(this)
+    }
 }
 
-const studentProxy = observable({name: 'turing', age: 89})
-
-autorun(() => {
-    console.log("student")
-})
-
-studentProxy.age = 89
+fn(obj)
