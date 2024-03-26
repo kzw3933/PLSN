@@ -2,6 +2,8 @@ const {Configuration} = require('webpack')
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {VueLoaderPlugin} = require('vue-loader');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
 /**
  * @type {Configuration}
  */
@@ -18,7 +20,13 @@ const config = {
         new HtmlWebpackPlugin({
             template: "./src/index.html"
         }),
-        new VueLoaderPlugin()
+        new VueLoaderPlugin(),
+        new MiniCssExtractPlugin({
+            filename: './[name]_[chunkhash].css',
+            chunkFilename: "./[id]_[chunkhash].css",
+            ignoreOrder: false,
+            linkType: "text/css",
+        })
     ],
     module: {
         rules:[
@@ -37,11 +45,11 @@ const config = {
             },
             {
                 test: /\.css$/,
-                use: ['style-loader', 'css-loader']
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             },
             {
                 test: /\.less$/,
-                use: ['style-loader', 'css-loader','less-loader']
+                use: [MiniCssExtractPlugin.loader, 'css-loader','less-loader']
             }
         ]
     },
