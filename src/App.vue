@@ -1,42 +1,36 @@
 <template>
     <div>
-      <form>
-        <input v-model="form.name" type="text">
-        <br>
-        <input v-model="form.age" type="text">
-        <br>
-        <button @click.prevent="submit">提交</button>
-      </form>
+      {{ man }}
     </div>
+    <hr>
     <div>
-      {{ obj }}
+      <button @click="change">点击</button>
     </div>
 </template>
 
 <script setup lang='ts'>
-// ref支持所有类型, reactive支持引用类型: Array object Map Set
-// ref取值、赋值都需要使用`.value`, reactive不需要
-// reactive 使用proxy实现 不能直接赋值，否则会破坏响应式对象 
-    import {ref, reactive, readonly, shallowReactive } from 'vue';
-    let form = reactive({
-      name: 'xm',
-      age: 23
-    }) 
+// toRef 只能修改对象的值对于非响应式对象视图无变化, 可提取响应式对象的属性且不丢失其响应性
+// toRefs 如果是一个响应式对象，提取其所有属性为响应式到一个新对象返回
+// toRaw 去除响应式效果
+    import {ref, reactive, toRef, toRefs, toRaw} from 'vue'
 
-    const read = readonly(form); // 只读，但是直接修改form还是会影响
+    
+    const man = reactive({
+      name: '张三',
+      age: 18
+    })
 
-    const submit = () => {
-      console.log(form)
-      console.log(read)
+    let name_ = toRef(man, 'name')
+
+    let {name, age} = toRefs(man)
+
+    const change = () => {
+      name_.value = '李四'
+      // man.name = '李四'
+      console.log(name)
+      console.log(name)
+      console.log(age)
     }
-
-    let obj = shallowReactive({
-      fool: {
-        bar: {
-          num: 1
-        }
-      }
-    }) // 只对修改obj.fool触发响应(即只深入一层)
 </script>
 
 <stype scoped>
