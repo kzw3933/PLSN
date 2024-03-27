@@ -1,72 +1,71 @@
 <template>
-  <div>
-    <div>
-      <!-- 模板插值 -->
-      {{ num }}
-      {{ arr.map(v => ({num: v})) }}
+    <div> 
+        {{man}}
     </div>
     <div>
-      <!-- vue指令 -->
-      <div v-text="str"></div>
-      <div v-html="html"></div>
-      <div v-if="bool">
-        true
-      </div>
-      <div v-else>
-        false
-      </div>
-      <div v-show="bool">
-        content
-      </div>
-      <button v-on:click="onclick">点击</button>
-      <div @click="parent">
-        <button v-on:[event].stop="onclick">点击</button> <!--  阻止冒泡 -->
-      </div>
-      <div v-bind:id="id">
-        {{ data }}
-      </div>
-      <div>
-        <input v-model="data" type="text">
-      </div>
+      {{ man2 }}
     </div>
-    <div v-for="item in strarr">
-      {{ item }}
+    <hr>
+    <div>
+      {{ obj }}
     </div>
-    <div v-for="(item, index) in strarr">
-      {{ item }} -- {{ index }}
-    </div>
-
-    <div :key="index" v-for="(item, index) in strarr">
-      {{ item }} -- {{ index }}
-    </div>
-    <div v-once>
-      {{ data }}
-    </div>
-  </div>
+    <hr>
+    <div ref="dom">Dom节点</div>
+    <button @click="change1">button1</button>
+    <button @click="change2">button2</button>
 </template>
 
-<script setup lang="ts">
-  import { ref } from 'vue';
+<script setup lang='ts'>
+    import {ref, isRef, shallowRef, triggerRef, customRef} from 'vue'
 
-  let num: number = 0;
-  const arr: number[] = [1,2,3]
-  const str: string = 'asdfghjkl'
-  const html: string = "<span style='color:red'>asdfghjkl</span>"
-  let bool: boolean = false
-  const onclick = () => {
-    num += 1;
-    console.log('点击'+num+'次')
-  }
-  const event: string = 'click'
-  const parent = () => {
-    console.log('父组件点击')
-  }
-  let id = 'start'
-  let data = ref('kzw')  // 使用ref才能成为响应式
+    type Man = {
+      name: string
+    }
 
-  const strarr: string[] = ['tyyty', 'sjkjds', 'sjdkksd']
+    const man = ref<Man>({
+      name: 'xm'
+    })
+
+    const man2 = shallowRef<Man>({
+      name: 'xm2'
+    })
+
+    const dom = ref<HTMLDivElement>() // 捕获dom对象
+
+    const change1 = () => {
+      man.value.name =  man.value.name + 's'
+      console.log(isRef(man));
+
+      console.log(dom.value?.innerHTML);
+    }
+
+    const change2 = () => {
+      // man2.value.name =  man2.value.name + 'd' 通过name赋值不会触发响应, 
+      // 但是ref和shallowRef的数据同时被修改会触发响应, 可使用triggerRef(man2)触发响应
+      man2.value = {
+        name: man2.value.name + 'd'
+      }
+    }
+
+    function MyRef<T>(value: T) {
+      return customRef((track, trigger) => {
+        return {
+          get() {
+            track()
+            return value
+          },
+          set(newVal) {
+            value = newVal
+            trigger()
+          }
+        }
+      })
+    }
+
+    const obj = MyRef<string>('myref')
+
 </script>
 
-<style>
+<stype scoped>
 
-</style>
+</stype>
