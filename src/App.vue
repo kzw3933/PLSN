@@ -1,69 +1,42 @@
 <template>
-    <div> 
-        {{man}}
-    </div>
     <div>
-      {{ man2 }}
+      <form>
+        <input v-model="form.name" type="text">
+        <br>
+        <input v-model="form.age" type="text">
+        <br>
+        <button @click.prevent="submit">提交</button>
+      </form>
     </div>
-    <hr>
     <div>
       {{ obj }}
     </div>
-    <hr>
-    <div ref="dom">Dom节点</div>
-    <button @click="change1">button1</button>
-    <button @click="change2">button2</button>
 </template>
 
 <script setup lang='ts'>
-    import {ref, isRef, shallowRef, triggerRef, customRef} from 'vue'
+// ref支持所有类型, reactive支持引用类型: Array object Map Set
+// ref取值、赋值都需要使用`.value`, reactive不需要
+// reactive 使用proxy实现 不能直接赋值，否则会破坏响应式对象 
+    import {ref, reactive, readonly, shallowReactive } from 'vue';
+    let form = reactive({
+      name: 'xm',
+      age: 23
+    }) 
 
-    type Man = {
-      name: string
+    const read = readonly(form); // 只读，但是直接修改form还是会影响
+
+    const submit = () => {
+      console.log(form)
+      console.log(read)
     }
 
-    const man = ref<Man>({
-      name: 'xm'
-    })
-
-    const man2 = shallowRef<Man>({
-      name: 'xm2'
-    })
-
-    const dom = ref<HTMLDivElement>() // 捕获dom对象
-
-    const change1 = () => {
-      man.value.name =  man.value.name + 's'
-      console.log(isRef(man));
-
-      console.log(dom.value?.innerHTML);
-    }
-
-    const change2 = () => {
-      // man2.value.name =  man2.value.name + 'd' 通过name赋值不会触发响应, 
-      // 但是ref和shallowRef的数据同时被修改会触发响应, 可使用triggerRef(man2)触发响应
-      man2.value = {
-        name: man2.value.name + 'd'
-      }
-    }
-
-    function MyRef<T>(value: T) {
-      return customRef((track, trigger) => {
-        return {
-          get() {
-            track()
-            return value
-          },
-          set(newVal) {
-            value = newVal
-            trigger()
-          }
+    let obj = shallowReactive({
+      fool: {
+        bar: {
+          num: 1
         }
-      })
-    }
-
-    const obj = MyRef<string>('myref')
-
+      }
+    }) // 只对修改obj.fool触发响应(即只深入一层)
 </script>
 
 <stype scoped>
